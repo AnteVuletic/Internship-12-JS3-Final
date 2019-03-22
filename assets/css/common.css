@@ -1,0 +1,19 @@
+body{
+    padding: 0;
+    margin: 0;
+}
+@font-face{
+    font-family: "Fuse V.2 Display";
+    src: url("../fonts/FuseV.2Display-Regular.2b6a1efd.otf");
+    font-weight: normal;
+}
+@font-face{
+    font-family: "Fuse V.2 Display";
+    src: url("../fonts/FuseV.2Display-Bold.c8091973.otf");
+    font-weight: bold;
+}
+@font-face{
+    font-family: "Fuse V.2 Display";
+    src: url("../fonts/FuseV.2Display-Black.7195687c.otf");
+    font-weight: 600;
+}

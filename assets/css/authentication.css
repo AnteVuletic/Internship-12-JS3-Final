@@ -1,0 +1,96 @@
+.authentication__wrapper{
+    position: fixed;
+    left:0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #1a3b43;
+    font-family: "Fuse V.2 Display";
+}
+.authentication{
+    display: flex;
+    overflow: hidden;
+    justify-content: center;
+    top: 0;
+    left: 0;
+    background-color: #30CEC2;
+    width: 50%;
+    height: 33%;
+    margin: 15% auto;
+    border-radius: 30px;
+}
+.authentication__img{
+    width: 40%;
+    overflow: hidden;
+}
+.authentication__img img{
+    width: 300%;
+    height: 100%;
+}
+.authentication__form{
+    box-sizing: border-box;
+    width: 60%;
+    background-color: #FFFFFF;
+}
+.authentication__form form{
+    width: 50%;
+    height: 100%;
+    margin: 0 auto;
+    padding: 10px;
+}
+.authentication__form input{
+    display: block;
+    outline: 0;
+    border: 0.5px solid rgba(125,125,125,0.5);
+    border-radius: 5px;
+    padding: 10px;
+    margin: 0 auto;
+}
+.register__wrapper input:invalid{
+    border-left: 2px solid rgb(200,50,0);
+}
+.register__wrapper input:valid{
+    border-left: 2px solid rgb(0,215,100);
+}
+.authentication__form input::placeholder{
+    font-family: "Fuse V.2 Display";
+    font-size: 14px;
+    font-weight: normal;
+}
+.authentication__form label{
+    display: block;
+    margin: 4px 0;
+    font-size: 16px;
+}
+.form__button{
+    display: block;
+    width: 66%;
+    background-color: #30cec2;
+    margin: 10px auto !important;
+    padding: 0;
+    border-radius: 15px;
+    font-family: "Fuse V.2 Display";
+    text-transform: uppercase;
+    font-weight: 600;
+    color: whitesmoke;
+}
+.login__wrapper .authentication__img > img{
+    background-color: rgb(0,215,100);
+}
+.login__wrapper .form__button{
+    background-color: rgb(0,215,100)
+}
+@media screen and (max-width: 1100px){
+    .authentication{
+        flex-direction: column;
+    }
+    .authentication__img{
+        width: 100%;
+    }
+    .authentication__img > img{
+        height: 500%;
+    }
+    .authentication__form{
+        width: 100%;
+    }
+}
