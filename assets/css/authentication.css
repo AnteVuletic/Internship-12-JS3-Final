@@ -46,10 +46,10 @@
     padding: 10px;
     margin: 0 auto;
 }
-.register__wrapper input:invalid{
+.authentication__form input:invalid{
     border-left: 2px solid rgb(200,50,0);
 }
-.register__wrapper input:valid{
+.authentication__form input:valid{
     border-left: 2px solid rgb(0,215,100);
 }
 .authentication__form input::placeholder{
