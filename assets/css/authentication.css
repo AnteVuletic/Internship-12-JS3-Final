@@ -100,6 +100,15 @@
     opacity: 1;
     top: -80%;
 }
+.errorMessage{
+    display: none;
+    padding: 5px;
+    color: rgb(200,50,0);
+    text-align: center;
+}
+.errorMessage span{
+    font-size: 14px;
+}
 @media screen and (max-width: 1100px){
     .authentication{
         flex-direction: column;

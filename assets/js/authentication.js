@@ -9,7 +9,8 @@
     }
     function AuthenticationService(entryPoint){
         ContentDelivery.call(this,entryPoint);
-        this.authorized = false;
+        this.isAuthorized = false;
+        this.authorizedEvent = new Event("authorized");
         this.validator;
         this.newUser;
         this.HTML_REGISTER_MARKUP = `<div class="authentication__wrapper register__wrapper">
@@ -44,9 +45,16 @@
                                         <div class="authentication__form">
                                             <form name="authentication">
                                                 <label>Username:</label>
-                                                <input type="text" name="username" minlength="5" maxlength="10" placeholder="Username"/>
+                                                <div class="tooltip">
+                                                    <input type="text" name="username" placeholder="Username" required/>
+                                                </div>
                                                 <label>Password:</label>
-                                                <input type="password" name="password" minlength="5" maxlength="10" placeholder="Password"/>
+                                                <div class="tooltip">
+                                                    <input type="password" name="password" placeholder="Password" required/>
+                                                </div>
+                                                <div class="errorMessage">
+                                                    <span>Invalid credentials try again.</span>
+                                                </div>
                                                 <input type="submit" name="action" class="form__button" value="Login"/>
                                             </form>
                                         </div>
@@ -76,7 +84,6 @@
         this.validator = document.getElementsByName("authentication")[0];
         this.validator.username.insertAdjacentElement('afterend',toolTipUser);
         this.validator.password.insertAdjacentElement('afterend',toolTipPassword);
-        this.validator.repeat.insertAdjacentElement('afterend',toolTipSpan);
         this.validator.username.onchange = () =>{
             if(this.validator.username.validity.tooShort || this.validator.username.validity.tooLong){
                 toolTipUser.style.visibility = "visible";
@@ -95,23 +102,92 @@
                 toolTipPassword.style.visibility ="hidden";
             }
         }
-        this.validator.repeat.onchange = () =>{
-            if(this.validator.password.value !== this.validator.repeat.value){
-                toolTipSpan.style.visibility ="visible";
-                this.validator.repeat.setCustomValidity("Password missmatch");
-                toolTipSpan.innerText = "Password missmatch.";
-                this.validator.repeat.insertAdjacentElement('afterend',toolTipSpan);
-                console.log(this.validator.repeat.validity)
-            }else{
-                this.validator.repeat.setCustomValidity("");
-                toolTipSpan.style.visibility ="hidden";
+        if(this.newUser){
+            this.validator.repeat.insertAdjacentElement('afterend',toolTipSpan);
+            this.validator.repeat.onchange = () =>{
+                if(this.validator.password.value !== this.validator.repeat.value){
+                    toolTipSpan.style.visibility ="visible";
+                    this.validator.repeat.setCustomValidity("Password missmatch");
+                    toolTipSpan.innerText = "Password missmatch.";
+                    this.validator.repeat.insertAdjacentElement('afterend',toolTipSpan);
+                }else{
+                    this.validator.repeat.setCustomValidity("");
+                    toolTipSpan.style.visibility ="hidden";
+                }
             }
         }
-        this.validator.action.addEventListener("click",(event)=>{
-            event.preventDefault();
-            
+        this.validator.action.addEventListener("authorized",(event)=>{
+            if(this.newUser){
+                if(this.validator.username.checkValidity() || this.validator.password.checkValidity() || this.validator.repeat.checkValidity()){
+                    window.localStorage.setItem(this.validator.username.value,this.validator.password.value);
+                }
+            }else{
+                if(this.validator.username.checkValidity() || this.validator.password.checkValidity()){
+                    let isUser = window.localStorage.getItem(this.validator.username.value);
+                    if(isUser !== null){
+                        if(this.validator.password.value === isUser){
+                            this.isAuthorized = true;
+                        }
+                    }
+                    else{
+                        this.validator.username.value = "";
+                        this.validator.password.value = "";
+                        document.querySelector(".errorMessage").style.display = "block";
+                        this.isAuthorized = false;
+                    }
+                }
+            }
         });
     }
-    var uAuth = new AuthenticationService(ID_MAIN_WRAPPER);
-    uAuth.initializeState();
+    function ApiManager(){
+        this.payloadUsers;
+        this.payloadPosts;
+    }
+    ApiManager.prototype.getUsers = function(){
+        return fetch("https://jsonplaceholder.typicode.com/users/1/posts")
+            .then(unserilizied => unserilizied.json())
+            .then(data => {
+                return this.payloadUsers = data;
+            })
+            .catch((err)=>{
+                console.log(err)
+            });
+    }
+    ApiManager.prototype.getPosts = function(){
+        return fetch("https://jsonplaceholder.typicode.com/users/1/posts")
+            .then(unserilizied => unserilizied.json())
+            .then(data =>{
+                return this.payloadPosts = data;
+            })
+            .catch((err)=>{
+                console.log(err)
+            });
+    }
+    ApiManager.prototype.getData = function(){
+        Promise.all([this.getPosts(),this.getUsers()]).then(_ =>{
+
+        });
+    }
+    function AppManager(entryPoint){
+        ContentDelivery.call(this,entryPoint);
+        this.api = new ApiManager();
+    }
+    AppManager.prototype = Object.create(ContentDelivery.prototype);
+    AppManager.prototype.run = function(){
+        this.authorize();
+    }
+    AppManager.prototype.authorize = function(){
+        let auth = new AuthenticationService(ID_MAIN_WRAPPER);
+        auth.initializeState();
+        return auth.validator.action.addEventListener("click",()=>{
+            event.preventDefault();
+            auth.validator.action.dispatchEvent(auth.authorizedEvent);
+            if(auth.isAuthorized){
+                this.api.getData();
+            }
+        });
+    }
+    let app = new AppManager(ID_MAIN_WRAPPER);
+    app.run();
+    
 })();
