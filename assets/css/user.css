@@ -6,6 +6,12 @@
     margin: 0 auto;
     font-family: "Fuse V.2 Display";
 }
+.card{
+    display: block;
+    width: 90%;
+    height: 100%;
+    margin: 0 auto;
+}
 .users__card{
     display: flex;
     flex-direction: column;
@@ -45,6 +51,97 @@
 }
 .card__footer{
     margin-top: 10px;
+}
+.details__wrapper{
+    display: none;
+}
+.users__details--show .details__wrapper{
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 110%;
+    width: 100%;
+    background-color: rgba(125,125,125,0.3);
+}
+.details{
+    display: block;
+    box-sizing: border-box;
+    position: relative;
+    margin: 0 auto;
+    opacity: 0;
+    transition: opacity 1.5s linear;
+    top: 15%;
+    width: 50%;
+    padding: 10px 50px;
+    height: fit-content;
+    background-color: #ffffff;
+    text-align: start;
+    z-index:2;
+}
+.users__details--show .details{
+    opacity: 1;
+}
+.details span{
+    display: block;
+    font-size: 13px;
+    color: rgb(125,125,125);
+}
+.details h1{
+    margin-top: 0;
+}
+.details h2{
+    font-size: 15px;
+    font-weight: bold;
+    margin: 5px;
+}
+.details__close{
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    right: 5px;
+    top: 5px;
+    background-color: #1F3C44;
+}
+.details__close span{
+    display: block;
+    width: 80%;
+    margin: 43% auto -52% auto;
+    height: 10%;
+    background-color: #ffffff;
+}
+.close__first{
+    transform: rotate(-45deg);
+}
+.close__second{
+    transform: rotate(45deg);
+}
+.scroll_up{
+    display: none;
+    background-color: #1F3C44; 
+    position: fixed;
+    width: 40px;
+    height: 40px;
+    bottom: 20px;
+    right: 20px;
+}
+.scroll_up--visible{
+    display: block;
+}
+.scroll_up span{
+    display: block;
+    width: 30%;
+    height: 10%;
+    background-color: #ffffff;
+}
+.scroll_up__first{
+    transform: rotate(45deg);
+    margin: 45% auto 0 45%;
+}
+.scroll_up__second{
+    transform: rotate(-45deg);
+    margin: -10% auto 0 27%;
 }
 @media screen and (max-width: 1024px){
     .users__card{

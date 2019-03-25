@@ -184,18 +184,40 @@
     }
     User.prototype.getUserCard = function(){
         return `<div id=${this.id} class="users__card">
-                    <div class="card__header">
-                        <img class="header__img" src="assets/images/pattern.png" draggable="false"/>
-                        <h2 class="header__username">${this.username}</h2>
+                    <div class="card">
+                        <div class="card__header">
+                            <img class="header__img" src="assets/images/pattern.png" draggable="false"/>
+                            <h2 class="header__username">${this.username}</h2>
+                        </div>
+                        <div class="card__main">
+                            <span class="main__id">ID: ${this.id}</span>
+                            <span class="main__name">Name: ${this.name}</span>
+                            <span class="main__email">Email: ${this.email}</span>
+                        </div>
+                        <div class="card__footer">
+                            <button class="footer__button footer__button--details">Details</button>
+                            <button class="footer__button footer__button--posts">Posts</button>
+                        </div>
                     </div>
-                    <div class="card__main">
-                        <span class="main__id">ID: ${this.id}</span>
-                        <span class="main__name">Name: ${this.name}</span>
-                        <span class="main__email">Email: ${this.email}</span>
-                    </div>
-                    <div class="card__footer">
-                        <button class="footer__button footer__button--details">Details</button>
-                        <button class="footer__button footer__button--posts">Posts</button>
+                    <div class="details__wrapper">
+                        <div class="details">
+                            <div class="details__close">
+                                <span class="close__first"></span>
+                                <span class="close__second"></span>
+                            </div>
+                            <h1>Name: ${this.name}</h1>
+                            <span>Username: ${this.username}</span>
+                            <span>Email: ${this.email}</span>
+                            <span>Phone: ${this.phone}</span>
+                            <span>Web: ${this.website}</span>
+                            <h2>Address:</h2>
+                            <span>Street: ${this.address.street}</span>
+                            <span>City: ${this.address.city}</span>
+                            <span>Zipcode: ${this.address.zipcode}</span>
+                            <h2>Company:</h2>
+                            <span>Name: ${this.company.name}</span>
+                            <span>Phrase ${this.company.catchPhrase}</span>
+                        </div>
                     </div>
                 </div>`;
     }
@@ -241,8 +263,43 @@
         this.users.forEach((user)=>{
             stageUserHTML += user.getUserCard();
         });
-        stageUserHTML +="</div>";
+        stageUserHTML +=`<a href="#" class="scroll_up">
+                            <span class="scroll_up__first"></span>
+                            <span class="scroll_up__second"></span>
+                        </a>
+                        </div>`;
         this.replaceHTML(stageUserHTML);
+        this.userDetailsListener();
+        this.userPostsListener();
+    }
+    AppManager.prototype.userDetailsListener = function(){
+        let scrollUp = document.querySelector(".scroll_up");
+        document.addEventListener("scroll",()=>{
+            if(window.scrollY >= 200)
+                scrollUp.classList.add("scroll_up--visible");
+            else
+                scrollUp.classList.remove("scroll_up--visible")
+        });
+        this.users.forEach((user)=>{
+            let userWrapper = document.getElementById(user.id);
+            let userCard = userWrapper.querySelector(".card");
+            let userDetailsWrapper = userWrapper.querySelector(".details__wrapper");
+            let closeWrapper = userDetailsWrapper.querySelector(".details__close");
+            userCard.addEventListener("click",()=>{
+                userWrapper.classList.add("users__details--show");
+            });
+            userDetailsWrapper.addEventListener("click",(event)=>{
+                event.stopPropagation();
+                if(event.target === userDetailsWrapper)
+                    userWrapper.classList.remove("users__details--show");
+            });
+            closeWrapper.addEventListener("click",()=>{
+                userWrapper.classList.remove("users__details--show");
+            });
+        })
+    }
+    AppManager.prototype.userPostsListener = function(){
+
     }
     let app = new AppManager(ID_MAIN_WRAPPER);
     app.run();
