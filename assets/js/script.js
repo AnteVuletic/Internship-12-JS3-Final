@@ -118,24 +118,21 @@
         }
         this.validator.action.addEventListener("authorized",(event)=>{
             if(this.newUser){
-                if(this.validator.username.checkValidity() || this.validator.password.checkValidity() || this.validator.repeat.checkValidity()){
+                if(!this.validator.username.validity.tooShort && !this.validator.password.validity.tooShort && !this.validator.repeat.validity.customError){
                     window.localStorage.setItem(this.validator.username.value,this.validator.password.value);
                 }
             }else{
-                if(this.validator.username.checkValidity() || this.validator.password.checkValidity()){
-                    let isUser = window.localStorage.getItem(this.validator.username.value);
-                    if(isUser !== null){
-                        if(this.validator.password.value === isUser){
-                            this.isAuthorized = true;
-                        }
-                    }
-                    else{
-                        this.validator.username.value = "";
-                        this.validator.password.value = "";
-                        document.querySelector(".errorMessage").style.display = "block";
-                        this.isAuthorized = false;
+                let isUser = window.localStorage.getItem(this.validator.username.value);
+                if(isUser !== null){
+                    if(this.validator.password.value === isUser){
+                        this.isAuthorized = true;
+                        return;
                     }
                 }
+                this.validator.username.value = "";
+                this.validator.password.value = "";
+                document.querySelector(".errorMessage").style.display = "block";
+                this.isAuthorized = false;
             }
         });
     }
@@ -144,7 +141,7 @@
         this.payloadPosts;
     }
     ApiManager.prototype.getUsers = function(){
-        return fetch("https://jsonplaceholder.typicode.com/users/1/posts")
+        return fetch("https://jsonplaceholder.typicode.com/users")
             .then(unserilizied => unserilizied.json())
             .then(data => {
                 return this.payloadUsers = data;
@@ -164,13 +161,31 @@
             });
     }
     ApiManager.prototype.getData = function(){
-        Promise.all([this.getPosts(),this.getUsers()]).then(_ =>{
-
-        });
+        return Promise.all([this.getPosts(),this.getUsers()]).then(_=>true);
+    }
+    function User(data){
+        this.id = data.id;
+        this.username = data.username;
+        this.name = data.name;
+        this.email = data.email;
+        this.phone = data.phone;
+        this.website = data.website;
+        this.address = {
+            street : data.address.street,
+            suite : data.address.suite,
+            city: data.address.city,
+            zipcode: data.address.zipcode
+        };
+        this.company = {
+            name: data.company.name,
+            catchPhrase: data.company.catchPhrase
+        }
+        this.posts =[];
     }
     function AppManager(entryPoint){
         ContentDelivery.call(this,entryPoint);
         this.api = new ApiManager();
+        this.users = [];
     }
     AppManager.prototype = Object.create(ContentDelivery.prototype);
     AppManager.prototype.run = function(){
@@ -183,9 +198,25 @@
             event.preventDefault();
             auth.validator.action.dispatchEvent(auth.authorizedEvent);
             if(auth.isAuthorized){
-                this.api.getData();
+                this.api.getData().finally(_=>{
+                    this.formatUsers();
+                });
             }
         });
+    }
+    AppManager.prototype.formatUsers = function(){
+        this.api.payloadUsers.forEach((user,index)=>{
+            this.users.push(new User(user));
+            this.api.payloadPosts
+                .filter((post)=>post.userId === this.users[index].id)
+                .forEach((filteredPost)=>{
+                    this.users[index].posts.push({
+                        postId : filteredPost.id,
+                        title: filteredPost.title,
+                        body : filteredPost.body
+                    });
+                });
+        })
     }
     let app = new AppManager(ID_MAIN_WRAPPER);
     app.run();
