@@ -1,0 +1,67 @@
+.users{
+    display: flex;
+    flex-wrap: wrap;
+    width: 80%;
+    justify-content: space-between;
+    margin: 0 auto;
+    font-family: "Fuse V.2 Display";
+}
+.users__card{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    box-sizing: border-box;
+    margin-top: 1%;
+    width: 30%;
+    height: 10%;
+    padding: 1% 0;
+    box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.25);
+}
+.header__img{
+    border-radius: 25px;
+    width: 50px;
+    height: 50px;
+}
+.header__username{
+    margin: 0 0 15% 0;
+}
+.card__main{
+    display: flex;
+    flex-direction: column;
+    text-align: start;
+    width: 90%;
+    font-size: 14px;
+}
+.footer__button{
+    font-family: "Fuse V.2 Display";
+    font-weight: bold;
+    color: #ffffff;
+    background-color: #1F3C44;
+    outline: 0;
+    border: none;
+    padding: 10px;
+    border-radius: 10px;
+}
+.card__footer{
+    margin-top: 10px;
+}
+@media screen and (max-width: 1024px){
+    .users__card{
+        width: 45%;
+    }
+}
+@media screen and (max-width: 768px){
+    .users{
+        width: 95%;
+    }
+    .users__card{
+        width: 48%;
+    }
+}
+@media screen and (max-width: 500px){
+    .users__card{
+        width: 95%;
+        margin: 0 auto;
+    }
+}

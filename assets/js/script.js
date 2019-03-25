@@ -182,6 +182,23 @@
         }
         this.posts =[];
     }
+    User.prototype.getUserCard = function(){
+        return `<div id=${this.id} class="users__card">
+                    <div class="card__header">
+                        <img class="header__img" src="assets/images/pattern.png" draggable="false"/>
+                        <h2 class="header__username">${this.username}</h2>
+                    </div>
+                    <div class="card__main">
+                        <span class="main__id">ID: ${this.id}</span>
+                        <span class="main__name">Name: ${this.name}</span>
+                        <span class="main__email">Email: ${this.email}</span>
+                    </div>
+                    <div class="card__footer">
+                        <button class="footer__button footer__button--details">Details</button>
+                        <button class="footer__button footer__button--posts">Posts</button>
+                    </div>
+                </div>`;
+    }
     function AppManager(entryPoint){
         ContentDelivery.call(this,entryPoint);
         this.api = new ApiManager();
@@ -200,6 +217,7 @@
             if(auth.isAuthorized){
                 this.api.getData().finally(_=>{
                     this.formatUsers();
+                    this.printUsers();
                 });
             }
         });
@@ -217,6 +235,14 @@
                     });
                 });
         })
+    }
+    AppManager.prototype.printUsers = function(){
+        let stageUserHTML = `<div class="users">`;
+        this.users.forEach((user)=>{
+            stageUserHTML += user.getUserCard();
+        });
+        stageUserHTML +="</div>";
+        this.replaceHTML(stageUserHTML);
     }
     let app = new AppManager(ID_MAIN_WRAPPER);
     app.run();
