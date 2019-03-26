@@ -219,6 +219,28 @@
                             <span>Phrase ${this.company.catchPhrase}</span>
                         </div>
                     </div>
+                    <div class="posts__wrapper">
+                        <div class="posts">
+                            <div class="posts__close">
+                                <span class="close__first"></span>
+                                <span class="close__second"></span>
+                            </div>
+                            <button class="posts__add">Add Post</button>
+                        </div>
+                    </div>
+                    <div class="add">
+                        <div class="add__close">
+                            <span class="close__first"></span>
+                            <span class="close__second"></span>
+                        </div>
+                        <form class="addPost">
+                            <label>Title:</label>
+                            <input type="text" name="title" placeholder="Insert title here" required/>
+                            <label>Body:</label>
+                            <textarea name="body" rows="5" cols="60" value="" required/> </textarea>
+                            <input type="submit" name="submitPost" class="form__button" value="Add post"/>
+                        </form>
+                    </div>
                 </div>`;
     }
     function AppManager(entryPoint){
@@ -258,6 +280,107 @@
                 });
         })
     }
+    AppManager.prototype.userDetailsListener = function(){
+        let scrollUp = document.querySelector(".scroll_up");
+        document.addEventListener("scroll",()=>{
+            if(window.scrollY >= 200 )
+                scrollUp.classList.add("scroll_up--visible");
+            else
+                scrollUp.classList.remove("scroll_up--visible")
+        });
+        this.users.forEach((user)=>{
+            let userWrapper = document.getElementById(user.id);
+            let btnPosts = userWrapper.querySelector(".footer__button--posts");
+            let userCard = userWrapper.querySelector(".card");
+            let userDetailsWrapper = userWrapper.querySelector(".details__wrapper");
+            let closeWrapper = userDetailsWrapper.querySelector(".details__close");
+            userCard.addEventListener("click",(event)=>{
+                if(event.target !== btnPosts){
+                    userWrapper.classList.add("users__details--show");
+                }
+            });
+            userDetailsWrapper.addEventListener("click",()=>{
+                if(event.target === userDetailsWrapper)
+                    userWrapper.classList.remove("users__details--show");
+            });
+            closeWrapper.addEventListener("click",()=>{
+                userWrapper.classList.remove("users__details--show");
+            });
+        })
+    }
+    AppManager.prototype.renderPosts = function(user,postsWrapper){
+        postsWrapper.innerHTML = `<div class="posts__close">
+                                        <span class="close__first"></span>
+                                        <span class="close__second"></span>
+                                    </div>
+                                    <button class="posts__add">Add Post</button>
+                                    <h1>User ID ${user.id}</h1>`;
+        user.posts.forEach((post)=>{
+        postsWrapper.innerHTML +=`<h2>Title: ${post.title}</h2>
+                                    <span>Post Id: ${post.postId}</span>
+                                    <span>Post: ${post.body}</span>`;
+        });
+    }
+    AppManager.prototype.userPostsListener = function(){
+        this.users.forEach((user)=>{
+            let userWrapper = document.getElementById(user.id);
+            let postsBackground = userWrapper.querySelector(".posts__wrapper");
+            let buttonPosts = userWrapper.querySelector(".footer__button--posts");
+            let postsWrapper = userWrapper.querySelector(".posts");
+            buttonPosts.addEventListener("click",()=>{
+                    this.renderPosts(user,postsWrapper);
+                    userWrapper.classList.add("posts__wrapper--show");
+                    postsBackground.addEventListener("click",()=>{
+                        if(event.target === postsBackground)
+                        userWrapper.classList.remove("posts__wrapper--show");
+                    });
+                    let buttonClose = userWrapper.querySelector(".posts__close");
+                    let buttonAdd = userWrapper.querySelector(".posts__add");
+                    let addForm = userWrapper.querySelector(".add");
+                    let closeForm = addForm.querySelector(".add__close");
+                    buttonClose.addEventListener("click",()=>{
+                        userWrapper.classList.remove("posts__wrapper--show");
+                    });
+                    buttonAdd.addEventListener("click",()=>{
+                        addForm.classList.add("add--show");
+                    });
+                    closeForm.addEventListener("click",()=>{
+                        addForm.classList.remove("add--show");
+                    });
+                    this.handlePostAdd(addForm,user,postsWrapper);
+                });
+            });
+    }
+    AppManager.prototype.handlePostAdd = function(addForm,user,postsWrapper){
+        let form = addForm.querySelector(".addPost");
+        form.submitPost.addEventListener("click",(event)=>{
+            event.preventDefault();
+            if(!form.title.validity.valueMissing && !form.body.validity.valueMissing){
+                fetch('https://jsonplaceholder.typicode.com/posts', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        title: form.title.value,
+                        body: form.body.value,
+                        userId: user.id
+                    }),
+                    headers: {
+                    "Content-type": "application/json; charset=UTF-8"
+                    }
+                })
+                .then(response => response.json())
+                .then(json =>{
+                    form.title.value = "";
+                    form.body.value ="";
+                    user.posts.push({
+                        title: json.title,
+                        body: json.body,
+                        postId: json.id
+                    });
+                    this.renderPosts(user,postsWrapper);
+                });
+            }
+        });
+    }
     AppManager.prototype.printUsers = function(){
         let stageUserHTML = `<div class="users">`;
         this.users.forEach((user)=>{
@@ -271,35 +394,6 @@
         this.replaceHTML(stageUserHTML);
         this.userDetailsListener();
         this.userPostsListener();
-    }
-    AppManager.prototype.userDetailsListener = function(){
-        let scrollUp = document.querySelector(".scroll_up");
-        document.addEventListener("scroll",()=>{
-            if(window.scrollY >= 200)
-                scrollUp.classList.add("scroll_up--visible");
-            else
-                scrollUp.classList.remove("scroll_up--visible")
-        });
-        this.users.forEach((user)=>{
-            let userWrapper = document.getElementById(user.id);
-            let userCard = userWrapper.querySelector(".card");
-            let userDetailsWrapper = userWrapper.querySelector(".details__wrapper");
-            let closeWrapper = userDetailsWrapper.querySelector(".details__close");
-            userCard.addEventListener("click",()=>{
-                userWrapper.classList.add("users__details--show");
-            });
-            userDetailsWrapper.addEventListener("click",(event)=>{
-                event.stopPropagation();
-                if(event.target === userDetailsWrapper)
-                    userWrapper.classList.remove("users__details--show");
-            });
-            closeWrapper.addEventListener("click",()=>{
-                userWrapper.classList.remove("users__details--show");
-            });
-        })
-    }
-    AppManager.prototype.userPostsListener = function(){
-
     }
     let app = new AppManager(ID_MAIN_WRAPPER);
     app.run();
