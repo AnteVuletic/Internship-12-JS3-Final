@@ -120,6 +120,8 @@
             if(this.newUser){
                 if(!this.validator.username.validity.tooShort && !this.validator.password.validity.tooShort && !this.validator.repeat.validity.customError){
                     window.localStorage.setItem(this.validator.username.value,this.validator.password.value);
+                    this.isAuthorized = true;
+                    return;
                 }
             }else{
                 let isUser = window.localStorage.getItem(this.validator.username.value);
